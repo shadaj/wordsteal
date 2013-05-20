@@ -1,0 +1,9 @@
+.cache
+.classpath
+.project
+.settings/
+.worksheet/
+bin/
+gen/
+libs/
+proguard_cache/
