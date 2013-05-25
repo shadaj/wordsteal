@@ -2,8 +2,9 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:orientation="vertical" >
-
+    android:orientation="vertical"
+    android:gravity="center_horizontal" >
+    
     <TextView
         android:id="@+id/characterDisplay"
         android:layout_width="fill_parent"
@@ -20,10 +21,12 @@
         android:singleLine="true" />
 
     <Button
+        android:id="@+id/checkButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="checkWord"
-        android:text="Check your word" />
+        android:text="Check your word"
+        android:enabled="false" />
 
     <TextView
         android:id="@+id/response"
