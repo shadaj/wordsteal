@@ -9,16 +9,18 @@
         android:id="@+id/characterDisplay"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
         android:text=""
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:gravity="center_horizontal" />
+        android:textSize="48dp" />
     
     <EditText
         android:id="@+id/input"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:hint="Your word here"
-        android:singleLine="true" />
+        android:singleLine="true"
+        android:textSize="36sp" />
 
     <Button
         android:id="@+id/checkButton"
@@ -30,8 +32,17 @@
 
     <TextView
         android:id="@+id/response"
+        android:text=""
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
+        android:id="@+id/points"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Points: 0"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
 
 </LinearLayout>

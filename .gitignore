@@ -7,3 +7,6 @@ bin/
 gen/
 libs/
 proguard_cache/
+project/project/
+project/target/
+target/

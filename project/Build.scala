@@ -23,7 +23,7 @@ object General {
     proguardSettings ++
     AndroidManifestGenerator.settings ++
     AndroidMarketPublish.settings ++ Seq (
-      keyalias in Android := "change-me",
+      keyalias in Android := "shadaj",
       manifestPath in Android := Seq(file("AndroidManifest.xml")),
       mainResPath in Android := file("res"),
       mainAssetsPath in Android := file("assets"),
