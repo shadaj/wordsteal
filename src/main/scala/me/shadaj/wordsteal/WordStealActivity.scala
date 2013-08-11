@@ -1,28 +1,25 @@
 package me.shadaj.wordsteal
 
-import java.io.InputStreamReader
+import scala.annotation.tailrec
+import scala.io.Source
+
 import android.app.Activity
 import android.os.Bundle
-import android.view.View
-import android.widget.EditText
-import android.widget.TextView
-import scala.io.Source
-import android.view.View.OnKeyListener
-import android.view.KeyEvent
-import android.widget.Button
-import android.util.Log
-import android.text.method.KeyListener
 import android.text.Editable
 import android.text.TextWatcher
-import scala.annotation.tailrec
-import android.opengl.Visibility
+import android.view.KeyEvent
+import android.view.View
+import android.view.View.OnKeyListener
+import android.widget.Button
+import android.widget.EditText
+import android.widget.TextView
 
-class WordStealActivity extends TypedActivity {
-  lazy val charactersDisplay = findView(TR.characterDisplay)
-  lazy val input = findView(TR.input)
-  lazy val response = findView(TR.response)
-  lazy val checkButton = findView(TR.checkButton)
-  lazy val points = findView(TR.points)
+class WordStealActivity extends Activity {
+  lazy val charactersDisplay = findViewById(R.id.characterDisplay).asInstanceOf[TextView]
+  lazy val input = findViewById(R.id.input).asInstanceOf[EditText]
+  lazy val response = findViewById(R.id.response).asInstanceOf[TextView]
+  lazy val checkButton = findViewById(R.id.checkButton).asInstanceOf[Button]
+  lazy val points = findViewById(R.id.points).asInstanceOf[TextView]
 
   lazy val assets = getAssets()
   lazy val en_US = Source.fromInputStream(assets.open("en_US.dic"))
@@ -38,8 +35,10 @@ class WordStealActivity extends TypedActivity {
   var currentEnd = randomChar
   var currentPoints = 0
 
+  var lives = 3
+  
   @tailrec
-  private def newLetters {
+  private def newLetters { 
     currentStart = randomChar
     currentEnd = randomChar
     if (words.count(s => s.head == currentStart && s.last == currentEnd) >= 100) {
@@ -51,7 +50,7 @@ class WordStealActivity extends TypedActivity {
 
   override def onCreate(savedInstanceState: Bundle) {
     super.onCreate(savedInstanceState)
-    setContentView(R.layout.main)
+    setContentView(R.layout.game)
 
     newLetters
     
@@ -86,13 +85,12 @@ class WordStealActivity extends TypedActivity {
     }
     
     en_US.close
-    assets.close
   }
 
   def checkWord(view: View) {
     val inputWord = input.getText().toString().toLowerCase
-    if (!(inputWord.length == 0)) {
-      val correct = words.exists(_ == inputWord)
+    if (!(inputWord.length <= 1)) {
+      val correct = words.contains(inputWord)
       val responseText = correct match {
         case true => "Correct!"
         case false => "Incorrect :("
@@ -103,6 +101,12 @@ class WordStealActivity extends TypedActivity {
       if (correct) {
         currentPoints += inputWord.length()*100
         points.setText("Points: " + currentPoints)
+      } else {
+        lives -= 1
+        
+        if (lives == 0) {
+          this.setContentView(R.layout.gameover)
+        }
       }
 
       response.setText(responseText)

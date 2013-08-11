@@ -1,40 +1,28 @@
 import sbt._
 
 import Keys._
-import AndroidKeys._
 
-object General {
-  val settings = Defaults.defaultSettings ++ Seq (
+import Defaults._
+
+import sbtandroid.AndroidPlugin._
+
+object AndroidBuild extends Build {
+  val globalSettings = Seq (
     name := "wordsteal",
     version := "0.1",
     versionCode := 0,
-    scalaVersion := "2.10.0",
-    platformName in Android := "android-4"
+    scalaVersion := "2.10.2",
+    platformName := "android-4",
+    useProguard := true,
+    keyalias := "shadaj",
+    mainResPath := file("res"),
+    mainAssetsPath := file("assets"),
+    managedScalaPath := file("gen")
   )
 
-  val proguardSettings = Seq (
-    useProguard in Android := true
-  )
-
-  lazy val fullAndroidSettings =
-    General.settings ++
-    AndroidProject.androidSettings ++
-    TypedResources.settings ++
-    proguardSettings ++
-    AndroidManifestGenerator.settings ++
-    AndroidMarketPublish.settings ++ Seq (
-      keyalias in Android := "shadaj",
-      manifestPath in Android := Seq(file("AndroidManifest.xml")),
-      mainResPath in Android := file("res"),
-      mainAssetsPath in Android := file("assets"),
-      managedScalaPath in Android := file("gen")
-    )
-}
-
-object AndroidBuild extends Build {
-  lazy val main = Project (
+  lazy val main = AndroidProject (
     "wordsteal",
     file("."),
-    settings = General.fullAndroidSettings
+    settings = globalSettings
   )
 }
