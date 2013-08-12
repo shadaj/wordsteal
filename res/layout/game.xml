@@ -29,6 +29,12 @@
         android:onClick="checkWord"
         android:text="Check your word"
         android:enabled="false" />
+    
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="skipWord"
+        android:text="Skip the word" />
 
     <TextView
         android:id="@+id/response"
@@ -42,6 +48,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Points: 0"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+    
+    <TextView
+        android:id="@+id/lives"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Lives: 3"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
 

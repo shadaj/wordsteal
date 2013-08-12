@@ -12,5 +12,25 @@
         android:text="Game Over!"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textSize="48dp" />
+    
+    <TextView
+        android:id="@+id/highScores"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:text=""
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textSize="24dp" />
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="reset"
+        android:text="Play Again" />
+
+    <ProgressBar
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    
 </LinearLayout>
