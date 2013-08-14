@@ -54,7 +54,7 @@
         android:id="@+id/lives"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Lives: 3"
+        android:text="Lives: 5"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
 

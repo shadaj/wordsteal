@@ -11,7 +11,8 @@
         android:gravity="center_horizontal"
         android:text="Game Over!"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textSize="48dp" />
+        android:textSize="48dp"
+        android:textColor="#f00" />
     
     <TextView
         android:id="@+id/highScores"
@@ -27,10 +28,4 @@
         android:layout_height="wrap_content"
         android:onClick="reset"
         android:text="Play Again" />
-
-    <ProgressBar
-        style="?android:attr/progressBarStyleLarge"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-    
 </LinearLayout>
