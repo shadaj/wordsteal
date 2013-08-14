@@ -28,7 +28,8 @@ class WordStealActivity extends Activity {
   def loadingProgress = findViewById(R.id.loadingProgress).asInstanceOf[ProgressBar]
   def highScores = findViewById(R.id.highScores).asInstanceOf[TextView]
 
-  val PERCENTAGE_TO_LOAD = 0.05
+  val PERCENTAGE_TO_LOAD = 0.01
+  val MAX_LIVES = 5
 
   val processedWords = collection.mutable.ArrayBuffer[(String, Set[String])]()
 
@@ -36,24 +37,23 @@ class WordStealActivity extends Activity {
     var showingLoadingScreen = true
     var linesSoFar = 0
 
-    val assets = getAssets
-
-    val dict = Source.fromInputStream(assets.open("web2.wordDic"))
+    val dict = Source.fromInputStream(getAssets.open("web2.wordDic"))
     val lines = dict.getLines()
-    val NUMBER_OF_LINES = lines.next.toInt
-
+    val numberOfLines = lines.next.toInt
+    val linesToLoadToStart = numberOfLines * PERCENTAGE_TO_LOAD;
+    
     val updateProgressBar = new Runnable {
       override def run {
         if (showingLoadingScreen) {
-          loadingProgress.setProgress(((linesSoFar / (NUMBER_OF_LINES * PERCENTAGE_TO_LOAD)) * 100).toInt)
+          loadingProgress.setProgress(((linesSoFar / linesToLoadToStart) * 100).toInt)
         }
       }
     }
 
-    dict.getLines.foreach { s =>
+    lines.foreach { s =>
       val split = s.split(' ')
       processedWords += ((split(0), split.tail.toSet))
-      if (linesSoFar / (NUMBER_OF_LINES * PERCENTAGE_TO_LOAD) >= 1 && showingLoadingScreen) {
+      if (showingLoadingScreen && linesSoFar >= linesToLoadToStart) {
         showingLoadingScreen = false
         val startGameRunnable = new Runnable {
           override def run() {
@@ -69,13 +69,8 @@ class WordStealActivity extends Activity {
     dict.close
   }
 
-  val A = 'a'.toInt
-  val Z = 'z'.toInt
-  val alphabetSize = Z - A + 1
-
   var currentPoints = 0
-
-  var lives = 5
+  var lives = MAX_LIVES
 
   var index = 0
 
@@ -84,7 +79,6 @@ class WordStealActivity extends Activity {
 
   def newLetters {
     index = (math.random * processedWords.size).toInt
-    val string = processedWords(index)._1
     charactersDisplay.setText(currentStart + "..." + currentEnd)
   }
 
@@ -209,7 +203,7 @@ class WordStealActivity extends Activity {
 
   def reset(view: View) {
     currentPoints = 0
-    lives = 3
+    lives = MAX_LIVES
     setContentView(R.layout.game)
     newLetters
 
