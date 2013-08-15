@@ -6,6 +6,7 @@
     android:gravity="center_horizontal" >
     
     <TextView
+        android:id="@+id/gameover"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"

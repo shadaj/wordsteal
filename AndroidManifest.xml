@@ -10,10 +10,10 @@
         android:label="wordsteal" >
         <activity
             android:name=".WordStealActivity"
-            android:label="wordsteal" >
+            android:label="wordsteal" 
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

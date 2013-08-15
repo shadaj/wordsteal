@@ -1,7 +1,6 @@
 package me.shadaj.wordsteal
 
 import scala.io.Source
-
 import android.app.Activity
 import android.content.Context
 import android.os.Bundle
@@ -16,10 +15,15 @@ import android.view.View.OnKeyListener
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ProgressBar
+import android.widget.TextSwitcher
 import android.widget.TextView
+import android.view.ViewGroup.LayoutParams
+import android.util.TypedValue
+import android.view.ViewGroup.LayoutParams._
+import android.view.animation.AnimationUtils
 
 class WordStealActivity extends Activity {
-  def charactersDisplay = findViewById(R.id.characterDisplay).asInstanceOf[TextView]
+  def charactersDisplay = findViewById(R.id.characterDisplay).asInstanceOf[TextSwitcher]
   def input = findViewById(R.id.input).asInstanceOf[EditText]
   def response = findViewById(R.id.response).asInstanceOf[TextView]
   def checkButton = findViewById(R.id.checkButton).asInstanceOf[Button]
@@ -31,7 +35,7 @@ class WordStealActivity extends Activity {
   val PERCENTAGE_TO_LOAD = 0.01
   val MAX_LIVES = 5
 
-  val processedWords = collection.mutable.ArrayBuffer[(String, Set[String])]()
+  val processedWords = new collection.mutable.ArrayBuffer[(String, Set[String])]()
 
   def processWords = {
     var showingLoadingScreen = true
@@ -116,12 +120,24 @@ class WordStealActivity extends Activity {
 
   def startGame {
     setContentView(R.layout.game)
+    def styledTextView = {
+      val textView = new TextView(this)
+      textView.setLayoutParams(new LayoutParams(MATCH_PARENT, WRAP_CONTENT))
+      textView.setGravity(android.view.Gravity.CENTER_HORIZONTAL)
+      textView.setTextAppearance(this, android.R.style.TextAppearance_Large)
+      textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 48)
+      
+      textView
+    }
+    charactersDisplay.addView(styledTextView)
+    charactersDisplay.addView(styledTextView)
     newLetters
     addInputWatchers
   }
 
   override def onCreate(savedInstanceState: Bundle) {
     super.onCreate(savedInstanceState)
+    
     setContentView(R.layout.loading)
 
     val loadThread = new Thread {
@@ -149,9 +165,10 @@ class WordStealActivity extends Activity {
     val thisGameStart = thisGameDisplay.indexOf('T')
     val thisGameEnd = thisGameStart + thisGameText.length
     thisGameColored.setSpan(new ForegroundColorSpan(android.graphics.Color.GREEN), thisGameStart, thisGameEnd, Spanned.SPAN_INCLUSIVE_INCLUSIVE)
-
     setContentView(R.layout.gameover)
     highScores.setText(thisGameColored)
+    val animation = AnimationUtils.loadAnimation(this, R.anim.bouncing)
+    findViewById(R.id.gameover).asInstanceOf[TextView].startAnimation(animation)
   }
 
   def checkWord(view: View) {
@@ -204,9 +221,6 @@ class WordStealActivity extends Activity {
   def reset(view: View) {
     currentPoints = 0
     lives = MAX_LIVES
-    setContentView(R.layout.game)
-    newLetters
-
-    addInputWatchers
+    startGame
   }
 }
