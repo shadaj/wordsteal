@@ -13,6 +13,9 @@ import View.OnKeyListener
 import animation.AnimationUtils
 import android.widget.{ Button, EditText, ProgressBar, TextSwitcher, TextView }
 import android.util.TypedValue
+import android.content.Intent
+import java.util.Timer
+import java.util.TimerTask
 
 class WordStealActivity extends Activity {
   def charactersDisplay: TextSwitcher = findViewById(R.id.characterDisplay).asInstanceOf[TextSwitcher]
@@ -23,16 +26,19 @@ class WordStealActivity extends Activity {
   def livesWidget: TextView = findViewById(R.id.lives).asInstanceOf[TextView]
   def loadingProgress: ProgressBar = findViewById(R.id.loadingProgress).asInstanceOf[ProgressBar]
   def highScores: List[TextView] = List(R.id.highScore0,
-                                        R.id.highScore1,
-                                        R.id.highScore2,
-                                        R.id.highScore3,
-                                        R.id.highScore4,
-                                        R.id.highScore5).map(id => findViewById(id).asInstanceOf[TextView])
+    R.id.highScore1,
+    R.id.highScore2,
+    R.id.highScore3,
+    R.id.highScore4,
+    R.id.highScore5).map(id => findViewById(id).asInstanceOf[TextView])
+  def timeView: TextView = findViewById(R.id.timeViewer).asInstanceOf[TextView]
 
   val PERCENTAGE_TO_LOAD = 0.01
   val MAX_LIVES = 5
   val CHARACTER_DISPLAY_FONT_SIZE = 48
   val HIGH_SCORE_MEMORY = 5
+  val START_SECONDS = 60
+  val WORDSTEAL_LINK = "https://play.google.com/store/apps/details?id=me.shadaj.wordsteal"
 
   val processedWords = new collection.mutable.ArrayBuffer[(String, Set[String])]()
 
@@ -76,6 +82,17 @@ class WordStealActivity extends Activity {
   var lives = MAX_LIVES
 
   var index = 0
+
+  var secondsRemaining = START_SECONDS
+  var secondsTimer: Timer = null
+  
+  def reduceTime: Unit = {
+    secondsRemaining -= 1
+    timeView.setText(secondsRemaining.toString)
+    if (secondsRemaining == 0) {
+      gameOver
+    }
+  }
 
   def currentStart: Char = processedWords(index)._1.head
   def currentEnd: Char = processedWords(index)._1.last
@@ -131,6 +148,18 @@ class WordStealActivity extends Activity {
     charactersDisplay.addView(styledTextView)
     newLetters
     addInputWatchers
+
+    secondsRemaining = START_SECONDS
+    secondsTimer = new Timer
+    secondsTimer.scheduleAtFixedRate(new TimerTask {
+      def run(): Unit = {
+        runOnUiThread(new Runnable {
+          def run(): Unit = {
+            reduceTime
+          }
+        })
+      }
+    }, 0, 1000)
   }
 
   override def onCreate(savedInstanceState: Bundle): Unit = {
@@ -168,6 +197,8 @@ class WordStealActivity extends Activity {
           views(index).startAnimation(animation)
         }
     }
+    
+    secondsTimer.cancel()
   }
 
   def checkWord(view: View): Unit = {
@@ -185,6 +216,7 @@ class WordStealActivity extends Activity {
         currentPoints += inputWord.length() * 100
         points.setText("Points: " + currentPoints)
         response.setTextColor(android.graphics.Color.GREEN)
+        secondsRemaining += inputWord.length
       }
 
       response.setText(responseText)
@@ -221,5 +253,14 @@ class WordStealActivity extends Activity {
     currentPoints = 0
     lives = MAX_LIVES
     startGame
+  }
+
+  def brag(view: View): Unit = {
+    val shareIntent = new Intent(android.content.Intent.ACTION_SEND)
+    shareIntent.setType("text/plain")
+    shareIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, s"I scored $currentPoints on Wordsteal!")
+    shareIntent.putExtra(android.content.Intent.EXTRA_TEXT,
+        s"I just scored $currentPoints on Wordsteal! Do you think that you can beat me? $WORDSTEAL_LINK")
+    startActivity(Intent.createChooser(shareIntent, "Brag to your friends!"))
   }
 }
