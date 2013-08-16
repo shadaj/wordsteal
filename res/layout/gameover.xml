@@ -16,7 +16,52 @@
         android:textColor="#f00" />
     
     <TextView
-        android:id="@+id/highScores"
+        android:id="@+id/highScore0"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:text=""
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textSize="24dp" />
+    
+    <TextView
+        android:id="@+id/highScore1"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:text=""
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textSize="24dp" />
+    
+    <TextView
+        android:id="@+id/highScore2"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:text=""
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textSize="24dp" />
+    
+    <TextView
+        android:id="@+id/highScore3"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:text=""
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textSize="24dp" />
+    
+    <TextView
+        android:id="@+id/highScore4"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:text=""
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textSize="24dp" />
+    
+    <TextView
+        android:id="@+id/highScore5"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"

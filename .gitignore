@@ -10,3 +10,5 @@ proguard_cache/
 project/project/
 project/target/
 target/
+.scalastyle
+scalastyle_config.xml

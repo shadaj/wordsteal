@@ -4,50 +4,49 @@ import scala.io.Source
 import android.app.Activity
 import android.content.Context
 import android.os.Bundle
-import android.text.Editable
-import android.text.SpannableStringBuilder
-import android.text.Spanned
-import android.text.TextWatcher
-import android.text.style.ForegroundColorSpan
-import android.view.KeyEvent
-import android.view.View
-import android.view.View.OnKeyListener
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ProgressBar
-import android.widget.TextSwitcher
-import android.widget.TextView
-import android.view.ViewGroup.LayoutParams
+import android.text.{ Editable, SpannableStringBuilder, Spanned, TextWatcher, style }
+import style.ForegroundColorSpan
+import android.view.{ KeyEvent, View, ViewGroup, animation }
+import ViewGroup.LayoutParams
+import LayoutParams.{ MATCH_PARENT, WRAP_CONTENT }
+import View.OnKeyListener
+import animation.AnimationUtils
+import android.widget.{ Button, EditText, ProgressBar, TextSwitcher, TextView }
 import android.util.TypedValue
-import android.view.ViewGroup.LayoutParams._
-import android.view.animation.AnimationUtils
 
 class WordStealActivity extends Activity {
-  def charactersDisplay = findViewById(R.id.characterDisplay).asInstanceOf[TextSwitcher]
-  def input = findViewById(R.id.input).asInstanceOf[EditText]
-  def response = findViewById(R.id.response).asInstanceOf[TextView]
-  def checkButton = findViewById(R.id.checkButton).asInstanceOf[Button]
-  def points = findViewById(R.id.points).asInstanceOf[TextView]
-  def livesWidget = findViewById(R.id.lives).asInstanceOf[TextView]
-  def loadingProgress = findViewById(R.id.loadingProgress).asInstanceOf[ProgressBar]
-  def highScores = findViewById(R.id.highScores).asInstanceOf[TextView]
+  def charactersDisplay: TextSwitcher = findViewById(R.id.characterDisplay).asInstanceOf[TextSwitcher]
+  def input: EditText = findViewById(R.id.input).asInstanceOf[EditText]
+  def response: TextView = findViewById(R.id.response).asInstanceOf[TextView]
+  def checkButton: Button = findViewById(R.id.checkButton).asInstanceOf[Button]
+  def points: TextView = findViewById(R.id.points).asInstanceOf[TextView]
+  def livesWidget: TextView = findViewById(R.id.lives).asInstanceOf[TextView]
+  def loadingProgress: ProgressBar = findViewById(R.id.loadingProgress).asInstanceOf[ProgressBar]
+  def highScores: List[TextView] = List(R.id.highScore0,
+                                        R.id.highScore1,
+                                        R.id.highScore2,
+                                        R.id.highScore3,
+                                        R.id.highScore4,
+                                        R.id.highScore5).map(id => findViewById(id).asInstanceOf[TextView])
 
   val PERCENTAGE_TO_LOAD = 0.01
   val MAX_LIVES = 5
+  val CHARACTER_DISPLAY_FONT_SIZE = 48
+  val HIGH_SCORE_MEMORY = 5
 
   val processedWords = new collection.mutable.ArrayBuffer[(String, Set[String])]()
 
-  def processWords = {
+  def processWords: Unit = {
     var showingLoadingScreen = true
     var linesSoFar = 0
 
     val dict = Source.fromInputStream(getAssets.open("web2.wordDic"))
     val lines = dict.getLines()
     val numberOfLines = lines.next.toInt
-    val linesToLoadToStart = numberOfLines * PERCENTAGE_TO_LOAD;
-    
+    val linesToLoadToStart = numberOfLines * PERCENTAGE_TO_LOAD
+
     val updateProgressBar = new Runnable {
-      override def run {
+      override def run: Unit = {
         if (showingLoadingScreen) {
           loadingProgress.setProgress(((linesSoFar / linesToLoadToStart) * 100).toInt)
         }
@@ -78,16 +77,16 @@ class WordStealActivity extends Activity {
 
   var index = 0
 
-  def currentStart = processedWords(index)._1.head
-  def currentEnd = processedWords(index)._1.last
+  def currentStart: Char = processedWords(index)._1.head
+  def currentEnd: Char = processedWords(index)._1.last
 
-  def newLetters {
+  def newLetters: Unit = {
     index = (math.random * processedWords.size).toInt
     charactersDisplay.setText(currentStart + "..." + currentEnd)
   }
 
-  def addInputWatchers {
-    val inputWatcher = new TextWatcher() {
+  def addInputWatchers: Unit = {
+    val inputWatcher = new TextWatcher {
       def afterTextChanged(s: Editable) {}
       def beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
       def onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
@@ -105,8 +104,8 @@ class WordStealActivity extends Activity {
     input.addTextChangedListener(inputWatcher)
 
     input.setOnKeyListener {
-      new OnKeyListener() {
-        def onKey(v: View, keyCode: Int, event: KeyEvent) = {
+      new OnKeyListener {
+        def onKey(v: View, keyCode: Int, event: KeyEvent): Boolean = {
           if (keyCode == KeyEvent.KEYCODE_ENTER) {
             checkWord(v)
             true
@@ -118,15 +117,14 @@ class WordStealActivity extends Activity {
     }
   }
 
-  def startGame {
+  def startGame: Unit = {
     setContentView(R.layout.game)
-    def styledTextView = {
+    def styledTextView: TextView = {
       val textView = new TextView(this)
       textView.setLayoutParams(new LayoutParams(MATCH_PARENT, WRAP_CONTENT))
       textView.setGravity(android.view.Gravity.CENTER_HORIZONTAL)
       textView.setTextAppearance(this, android.R.style.TextAppearance_Large)
-      textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 48)
-      
+      textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, CHARACTER_DISPLAY_FONT_SIZE)
       textView
     }
     charactersDisplay.addView(styledTextView)
@@ -135,43 +133,44 @@ class WordStealActivity extends Activity {
     addInputWatchers
   }
 
-  override def onCreate(savedInstanceState: Bundle) {
+  override def onCreate(savedInstanceState: Bundle): Unit = {
     super.onCreate(savedInstanceState)
-    
+
     setContentView(R.layout.loading)
 
     val loadThread = new Thread {
-      override def run() {
+      override def run(): Unit = {
         processWords
       }
     }
 
-    loadThread.start()
+    loadThread.start
   }
 
-  def gameOver {
+  def gameOver: Unit = {
     val pref = getPreferences(Context.MODE_PRIVATE)
     val previousScores = pref.getString("highscores", "-1").split(" ").toList.map(_.toInt).filter(_ >= 0)
     val newScores = (currentPoints :: previousScores).sorted.reverse
-    val editor = pref.edit()
-    editor.putString("highscores", newScores.take(10).mkString(" "))
-    editor.commit()
+    val editor = pref.edit
+    editor.putString("highscores", newScores.take(HIGH_SCORE_MEMORY).mkString(" "))
+    editor.commit
 
     val thisGameIndex = newScores.indexOf(currentPoints)
-    val thisGameText = "THIS GAME: " + newScores(thisGameIndex)
-    val thisGameDisplay = newScores.map(_.toString).updated(thisGameIndex, thisGameText).mkString("\n")
 
-    val thisGameColored = new SpannableStringBuilder(thisGameDisplay)
-    val thisGameStart = thisGameDisplay.indexOf('T')
-    val thisGameEnd = thisGameStart + thisGameText.length
-    thisGameColored.setSpan(new ForegroundColorSpan(android.graphics.Color.GREEN), thisGameStart, thisGameEnd, Spanned.SPAN_INCLUSIVE_INCLUSIVE)
     setContentView(R.layout.gameover)
-    highScores.setText(thisGameColored)
-    val animation = AnimationUtils.loadAnimation(this, R.anim.bouncing)
-    findViewById(R.id.gameover).asInstanceOf[TextView].startAnimation(animation)
+    val views = highScores
+    newScores.take(HIGH_SCORE_MEMORY + 1).zipWithIndex.foreach {
+      case (text, index) =>
+        views(index).setText(text.toString)
+        if (index == thisGameIndex) {
+          views(index).setTextColor(android.graphics.Color.GREEN)
+          val animation = AnimationUtils.loadAnimation(this, R.anim.bouncing)
+          views(index).startAnimation(animation)
+        }
+    }
   }
 
-  def checkWord(view: View) {
+  def checkWord(view: View): Unit = {
     val inputWord = input.getText.toString.toLowerCase
     if (!(inputWord.length <= 1)) {
       val correct = processedWords(index)._2.contains(inputWord.tail.init)
@@ -204,7 +203,7 @@ class WordStealActivity extends Activity {
     }
   }
 
-  def skipWord(view: View) {
+  def skipWord(view: View): Unit = {
     lives -= 1
 
     if (lives == 0) {
@@ -218,7 +217,7 @@ class WordStealActivity extends Activity {
     }
   }
 
-  def reset(view: View) {
+  def reset(view: View): Unit = {
     currentPoints = 0
     lives = MAX_LIVES
     startGame
