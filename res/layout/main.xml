@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal"
+    android:orientation="vertical" >
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Wordsteal"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textSize="48dp" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="startGame"
+        android:text="Start the Game" />
+
+    <LinearLayout
+        android:id="@+id/sign_in_bar"
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:layout_marginTop="30dp"
+        android:background="#f0f0f0"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="10dp" >
+
+        <com.google.android.gms.common.SignInButton
+            android:id="@+id/sign_in_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_weight="1"
+            android:text="OPTIONAL: Sign in to get ranked on the leaderboards and earn achievments!"
+            android:textColor="#808080" />
+    </LinearLayout>
+
+    <LinearLayout android:id="@+id/sign_out_bar"
+        android:layout_height="120dp"
+        android:layout_width="match_parent"
+        android:background="#f0f0f0"
+        android:layout_marginTop="30dp"
+        android:orientation="horizontal"
+        android:gravity="center|right"
+        android:padding="10dp"
+        android:visibility="gone">
+
+        <TextView android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="You are already signed in to Play Games!"
+            android:layout_marginRight="10dp"
+            android:textColor="#808080" />
+
+         <Button
+            android:onClick="signOutGame"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sign out"
+            android:textSize="12sp" />
+    </LinearLayout>
+    
+    <Button android:id="@+id/viewAchievements" 
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="View Achievments"
+        android:onClick="showAchieve"
+        android:visibility="gone"/>
+    
+    <Button android:id="@+id/viewLeaderboards" 
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="View Leaderboards"
+        android:onClick="showLeader"
+        android:visibility="gone"/> 
+
+</LinearLayout>

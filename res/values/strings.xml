@@ -1,5 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="switch_fruit">Switch the fruit</string>
-
+    <string name="app_id">528117257538</string>
+    
+    <string name="perfect10">CgkIwqr3sa8PEAIQAg</string>
+    <string name="gettingStarted">CgkIwqr3sa8PEAIQAw</string>
+    <string name="gettingThis">CgkIwqr3sa8PEAIQBA</string>
+    <string name="novice">CgkIwqr3sa8PEAIQBQ</string>
+    <string name="intermediate">CgkIwqr3sa8PEAIQBg</string>
+    <string name="advanced">CgkIwqr3sa8PEAIQBw</string>
+    <string name="millionaire">CgkIwqr3sa8PEAIQCA</string>
+    
+    <string name="highScoreLeaderboard">CgkIwqr3sa8PEAIQAQ</string>
 </resources>

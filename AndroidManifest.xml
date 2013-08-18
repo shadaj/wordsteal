@@ -2,13 +2,15 @@
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="me.shadaj.wordsteal"
-    android:versionCode="9"
-    android:versionName="1.8" >
+    android:versionCode="11"
+    android:versionName="1.9.1" >
     <uses-sdk android:targetSdkVersion="18" android:minSdkVersion="1"/>
     
     <application
         android:icon="@drawable/icon"
         android:label="wordsteal" >
+        <meta-data android:name="com.google.android.gms.games.APP_ID"
+        android:value="@string/app_id" />
         <activity
             android:name=".WordStealActivity"
             android:label="wordsteal" 
