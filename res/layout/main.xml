@@ -10,13 +10,19 @@
         android:layout_height="wrap_content"
         android:text="Wordsteal"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textSize="48dp" />
+        android:textSize="35sp" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="startGame"
         android:text="Start the Game" />
+    
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="How to Play"
+        android:onClick="showHowToPlay" />
 
     <LinearLayout
         android:id="@+id/sign_in_bar"

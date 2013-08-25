@@ -20,6 +20,7 @@ import com.google.example.games.basegameutils.BaseGameActivity
 import com.google.android.gms.games.GamesClient
 import android.hardware.input.InputManager
 import android.view.inputmethod.InputMethodManager
+import android.content.SharedPreferences
 
 class WordStealActivity extends BaseGameActivity with View.OnClickListener {
   def charactersDisplay: TextSwitcher = findViewById(R.id.characterDisplay).asInstanceOf[TextSwitcher]
@@ -45,36 +46,56 @@ class WordStealActivity extends BaseGameActivity with View.OnClickListener {
   val START_SECONDS = 60
   val WORDSTEAL_LINK = "https://play.google.com/store/apps/details?id=me.shadaj.wordsteal"
 
+  lazy val pref: SharedPreferences = getSharedPreferences("WordStealActivity", Context.MODE_PRIVATE)
+
+  def loadShowHowToPlay: Unit = {
+    if (currentScreen == LOADING) {
+      val startGameRunnable = new Runnable {
+        override def run() {
+          currentScreen = HOW_TO_PLAY
+          setContentView(R.layout.howtoplay)
+        }
+      }
+      runOnUiThread(startGameRunnable)
+    }
+  }
+
+  def loadShowMain: Unit = {
+    if (currentScreen == LOADING) {
+      val startGameRunnable = new Runnable {
+        override def run() {
+          currentScreen = MAIN_MENU
+          showMain
+        }
+      }
+      runOnUiThread(startGameRunnable)
+    }
+  }
+
   val processedWords = new collection.mutable.ArrayBuffer[(String, Set[String])]()
 
   var signedIn = false
-  var showingLoadingScreen = true
+
+  val LOADING = 0
+  val HOW_TO_PLAY = 1
+  val MAIN_MENU = 2
+  val GAME = 3
+  val GAMEOVER = 4
+  var currentScreen = LOADING
+
+  def addToDictionary(value: (String, Set[String])): Unit = {
+    processedWords += value
+  }
 
   def processWords: Unit = {
-    var linesSoFar = 0
-
-    val dict = Source.fromInputStream(getAssets.open("web2.wordDic"))
-    val lines = dict.getLines()
-    val numberOfLines = lines.next.toInt
-    val linesToLoadToStart = numberOfLines * PERCENTAGE_TO_LOAD
-
-    lines.foreach { s =>
-      val split = s.split(' ')
-      processedWords += ((split(0), split.tail.toSet))
-      if (showingLoadingScreen && linesSoFar >= linesToLoadToStart) {
-        showingLoadingScreen = false
-        val activity = this
-        val startGameRunnable = new Runnable {
-          override def run() {
-            showMain
-          }
-        }
-        runOnUiThread(startGameRunnable)
-      } else {
-        linesSoFar += 1
+    val dict = Source.fromInputStream(getAssets.open("2of12.wordDic"))
+    val loadThread = new Thread {
+      override def run(): Unit = {
+        WordDataParser.parseData(dict, addToDictionary)(PERCENTAGE_TO_LOAD, loadShowMain)
       }
     }
-    dict.close
+
+    loadThread.start
   }
 
   var currentPoints = 0
@@ -140,7 +161,7 @@ class WordStealActivity extends BaseGameActivity with View.OnClickListener {
   }
 
   def startGame: Unit = {
-    lives = 5
+    lives = MAX_LIVES
     setContentView(R.layout.game)
     def styledTextView: TextView = {
       val textView = new TextView(this)
@@ -176,20 +197,12 @@ class WordStealActivity extends BaseGameActivity with View.OnClickListener {
     super.onCreate(savedInstanceState)
 
     setContentView(R.layout.loading)
-
-    val loadThread = new Thread {
-      override def run(): Unit = {
-        processWords
-      }
-    }
-
-    loadThread.start
+    processWords
   }
 
   def gameOver: Unit = {
     val inputManager = getSystemService(Context.INPUT_METHOD_SERVICE).asInstanceOf[InputMethodManager]
     inputManager.hideSoftInputFromWindow(input.getWindowToken(), 0)
-    val pref = getPreferences(Context.MODE_PRIVATE)
     val previousScores = pref.getString("highscores", "-1").split(" ").toList.map(_.toInt).filter(_ >= 0)
     val newScores = (currentPoints :: previousScores).sorted.reverse
     val editor = pref.edit
@@ -212,25 +225,26 @@ class WordStealActivity extends BaseGameActivity with View.OnClickListener {
 
     secondsTimer.cancel()
 
+    val currentPointsSoFar = pref.getInt("pointsSoFar", 0)
+
     if (signedIn) {
       if (!pref.contains("pointsSoFar")) {
         gamesClient.unlockAchievement(getString(R.string.gettingStarted))
       }
-      val currentPointsSoFar = pref.getInt("pointsSoFar", 0)
-      editor.putInt("pointsSoFar", currentPointsSoFar + currentPoints)
+
       val difference = ((currentPointsSoFar + currentPoints) / 1000) - (currentPointsSoFar / 1000)
       if (difference >= 1) {
+        gamesClient.incrementAchievement(getString(R.string.gettingThis), difference)
         gamesClient.incrementAchievement(getString(R.string.novice), difference)
         gamesClient.incrementAchievement(getString(R.string.intermediate), difference)
         gamesClient.incrementAchievement(getString(R.string.advanced), difference)
         gamesClient.incrementAchievement(getString(R.string.millionaire), difference)
-        gamesClient.incrementAchievement(getString(R.string.gettingThis), difference)
       }
 
-      if (newScores.head == currentPoints) {
-        gamesClient.submitScore(getString(R.string.highScoreLeaderboard), currentPoints)
-      }
+      gamesClient.submitScore(getString(R.string.highScoreLeaderboard), newScores.head)
     }
+
+    editor.putInt("pointsSoFar", currentPointsSoFar + currentPoints)
   }
 
   def checkWord(view: View): Unit = {
@@ -260,7 +274,6 @@ class WordStealActivity extends BaseGameActivity with View.OnClickListener {
       if (!correct) {
         response.setTextColor(android.graphics.Color.RED)
         lives -= 1
-
         if (lives == 0) {
           gameOver
         } else {
@@ -299,18 +312,26 @@ class WordStealActivity extends BaseGameActivity with View.OnClickListener {
     startActivity(Intent.createChooser(shareIntent, "Brag to your friends!"))
   }
 
+  def showHowToPlay(view: View): Unit = {
+    setContentView(R.layout.howtoplay)
+  }
+
   def onSignInFailed: Unit = {
 
   }
 
   def onSignInSucceeded: Unit = {
     signedIn = true
-    if (!showingLoadingScreen) {
-      findViewById(R.id.sign_in_bar).setVisibility(View.GONE)
-      findViewById(R.id.sign_out_bar).setVisibility(View.VISIBLE)
+    if (currentScreen == MAIN_MENU) {
+      try {
+        findViewById(R.id.sign_in_bar).setVisibility(View.GONE)
+        findViewById(R.id.sign_out_bar).setVisibility(View.VISIBLE)
 
-      findViewById(R.id.viewAchievements).setVisibility(View.VISIBLE)
-      findViewById(R.id.viewLeaderboards).setVisibility(View.VISIBLE)
+        findViewById(R.id.viewAchievements).setVisibility(View.VISIBLE)
+        findViewById(R.id.viewLeaderboards).setVisibility(View.VISIBLE)
+      } catch {
+        case _ =>
+      }
     }
   }
 
@@ -332,6 +353,7 @@ class WordStealActivity extends BaseGameActivity with View.OnClickListener {
   }
 
   def showMain: Unit = {
+    currentScreen = MAIN_MENU
     setContentView(R.layout.main)
     findViewById(R.id.sign_in_button).setOnClickListener(this)
     if (signedIn) {
