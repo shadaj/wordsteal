@@ -2,12 +2,9 @@ package me.shadaj.wordsteal
 
 import java.util.Timer
 import java.util.TimerTask
-
 import scala.io.Source
-
 import com.google.android.gms.games.GamesClient
 import com.google.example.games.basegameutils.BaseGameActivity
-
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -154,8 +151,10 @@ class WordStealActivity extends BaseGameActivity with View.OnClickListener {
       }
     }
   }
-
+  
   def startGame: Unit = {
+    currentScreen = GAME
+    currentPoints = 0
     lives = MAX_LIVES
     setContentView(R.layout.game)
     def styledTextView: TextView = {
@@ -196,6 +195,7 @@ class WordStealActivity extends BaseGameActivity with View.OnClickListener {
   }
 
   def gameOver: Unit = {
+    currentScreen = GAMEOVER
     val inputManager = getSystemService(Context.INPUT_METHOD_SERVICE).asInstanceOf[InputMethodManager]
     inputManager.hideSoftInputFromWindow(input.getWindowToken(), 0)
     val previousScores = pref.getString("highscores", "-1").split(" ").toList.map(_.toInt).filter(_ >= 0)
@@ -237,7 +237,7 @@ class WordStealActivity extends BaseGameActivity with View.OnClickListener {
     editor.putInt("pointsSoFar", currentPointsSoFar + currentPoints)
     editor.commit()
   }
-
+  
   def wordCorrect(word: String) = {
     processedWords(index)._2.contains(word.tail.init)
   }
@@ -292,12 +292,6 @@ class WordStealActivity extends BaseGameActivity with View.OnClickListener {
     }
   }
 
-  def reset(view: View): Unit = {
-    currentPoints = 0
-    lives = MAX_LIVES
-    startGame
-  }
-
   def brag(view: View): Unit = {
     val shareIntent = new Intent(android.content.Intent.ACTION_SEND)
     shareIntent.setType("text/plain")
@@ -308,6 +302,7 @@ class WordStealActivity extends BaseGameActivity with View.OnClickListener {
   }
 
   def showHowToPlay(view: View): Unit = {
+    currentScreen = HOW_TO_PLAY
     setContentView(R.layout.howtoplay)
   }
 

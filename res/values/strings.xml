@@ -11,4 +11,6 @@
     <string name="millionaire">CgkIwqr3sa8PEAIQCA</string>
     
     <string name="highScoreLeaderboard">CgkIwqr3sa8PEAIQAQ</string>
+    
+    <color name="mainColor">#ff1884c7</color>
 </resources>
